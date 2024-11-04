@@ -1,0 +1,1 @@
+Keeping the yaml file in /etc/kubernetes/manifests and when we delete the pod the pod gets recreated.
