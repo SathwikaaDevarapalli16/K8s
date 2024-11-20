@@ -1,35 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mavenwebapp-dp
+  name: mavenwebappdp
   labels:
-    name: mavenwebapp
+    app: mavenwebappdp
   namespace: test-ns
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: mavenwebapp
-  template:
-    metadata:
-      name: webapppod
-      labels:
-        app: mavenwebapp
-    spec:
-      containers:
-      - name: mavenwebappcontainer
-        image: user593/maven-web-app:1
-        ports:
-        - containerPort: 8080
+    replicas: 3
+    selector:
+      matchLabels:
+        app: mavenwebappdp
+    template:
+      metadata:
+        labels:
+          app: mavenwebappdp
+      spec:
+        containers:
+        - name: mavenwebappdp
+          image: user593/maven-web-app:1
+          ports:
+          - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mavensvc
+  name: mavenwebappdp
+  namespace: test-ns
+  labels:
+    app: mavenwebappdp
 spec:
   type: NodePort
   selector:
-    name: mavenwebapp
+    app: mavenwebappdp
   ports:
   - port: 8080
     targetPort: 8080
+    nodePort: 30030
