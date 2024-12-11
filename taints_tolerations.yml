@@ -1,0 +1,65 @@
+# kubectl taint nodes ip-172-31-92-21 node=HatePod:NoExecute
+# kubectl describe node | grep "Taints"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python
+  labels:
+    app: python
+  namespace: test-ns
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: python
+  template:
+    metadata:
+      labels:
+        app: python
+    spec:
+      tolerations:
+      - key: "node.kubernetes.io/control-plane"
+      - effect: "NoExecute"
+        operator: "Exists"
+      containers:
+      - name: python
+        image: dockerhandson/python-flask-api:2
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 400m
+            memory: 512Mi
+          limits:
+            cpu: 1
+            memory: 1Gi
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python
+  namespace: test-ns
+  labels:
+    app: pyhton
+spec:
+  type: NodePort
+  selector:
+    app: python
+  ports:
+  - port: 80
+    targetPort: 5000
+    nodePort: 30030
